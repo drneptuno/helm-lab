@@ -1,73 +1,105 @@
-🧾 Documento: Automatización del Despliegue con ArgoCD y Helm sobre Kubernetes local
+# 🚀 Automatización del Despliegue con ArgoCD y Helm sobre Kubernetes (Minikube)
 
-✅ Objetivo del proceso
-Automatizar completamente el paso del cambio de imagen a la ejecución del despliegue, eliminando pasos manuales innecesarios, asegurando trazabilidad y reduciendo riesgos humanos.
+Este laboratorio documenta la implementación de un entorno **GitOps** automatizado utilizando **ArgoCD**, **Helm** y **Kubernetes (Minikube)**. Su propósito es eliminar pasos manuales en el proceso de despliegue, mejorando la trazabilidad, velocidad y seguridad del pipeline.
 
-🔹 Solución Implementada
-Se implementó un entorno GitOps utilizando ArgoCD y Helm, junto con un cluster de desarrollo en Minikube para pruebas locales.
+---
 
-🔧 Pasos realizados:
-Preparación del entorno local:
+## ✅ Objetivo
 
-Instalación de Minikube y despliegue de ArgoCD en el namespace argocd.
+> Automatizar completamente el paso desde el cambio de versión de una imagen hasta su despliegue en Kubernetes, eliminando la intervención manual innecesaria y reduciendo el riesgo de errores humanos.
 
-Repositorio Git:
+---
 
-    Se creó un repositorio Git con una estructura Helm (charts/servicio) y archivos values.yaml con el tag de imagen versionado.
+## 🧩 Arquitectura y Solución Implementada
 
-Creación de aplicación en ArgoCD:
+Se construyó un flujo de automatización utilizando las siguientes herramientas:
 
-    Se definió la app servicio que apunta al repositorio Git.
+- ✅ **Minikube** como entorno de Kubernetes local.
+- ✅ **ArgoCD** para la gestión GitOps.
+- ✅ **Helm** para empaquetado y despliegue de aplicaciones.
+- ✅ **GitHub** como fuente de la verdad para el código y configuración.
 
-    Se habilitó sincronización automática con políticas de:
+---
 
-    auto-sync: aplicar cambios sin intervención.
+## 🔧 Pasos Realizados
 
-    prune: eliminar recursos obsoletos.
+### 1. Preparación del Entorno Local
 
-    self-heal: reponer recursos modificados fuera de Git.
+- Instalación de **Minikube**.
+- Despliegue de **ArgoCD** en el namespace `argocd`.
+- Acceso a la interfaz de ArgoCD.
 
-Prueba de despliegue automático:
+### 2. Estructura del Repositorio Git
 
-    Se actualizó el tag de imagen en values.yaml, se hizo commit y push.
+- Se creó un repositorio con estructura Helm:
 
-    ArgoCD detectó el cambio, desplegó la nueva versión en Kubernetes, y eliminó los recursos antiguos automáticamente.
+helm-lab/
+└── charts/
+└── servicio/
+├── Chart.yaml
+├── values.yaml
+└── templates/
 
-🔍 Beneficios Obtenidos
+- El archivo `values.yaml` contiene el tag de imagen versionado.
 
-| Aspecto                | Antes                                      | Después (Automatizado)                               |
-| ---------------------- | ------------------------------------------ | ---------------------------------------------------- |
-| Despliegue             | Manual con `helm upgrade`                  | Automático vía ArgoCD al detectar cambios en Git     |
-| Tiempo de intervención | Alto (edición manual + comandos)           | Nulo o muy bajo (solo revisión si es necesario)      |
-| Trazabilidad           | Parcial (sin seguimiento claro de cambios) | Completa (todo versionado en Git, visible en ArgoCD) |
-| Riesgo de error humano | Alto                                       | Bajo                                                 |
-| Rollbacks              | Manual, propenso a errores                 | ArgoCD permite `rollback` automático desde la UI     |
-| Visibilidad del estado | Indirecta (requiere acceso a pods)         | Directa desde UI web de ArgoCD                       |
+### 3. Creación de la Aplicación en ArgoCD
 
-👤 Nuevo Rol en el Proceso
+- Se definió la app `servicio` en ArgoCD apuntando al repo Git.
+- Se habilitaron políticas:
+- 🔁 `auto-sync`: sincroniza cambios automáticamente.
+- 🧹 `prune`: elimina recursos obsoletos.
+- 🛠️ `self-heal`: repara recursos modificados fuera de Git.
 
-    Antes, tu rol implicaba intervención operativa manual en cada despliegue.
+### 4. Prueba del Despliegue Automático
 
-    Ahora, tu función se transforma en un rol de supervisión y control de calidad, enfocado en:
+- Se actualizó el tag de imagen en `values.yaml`, commit y push.
+- ArgoCD detectó el cambio automáticamente y desplegó la nueva versión.
+- Los recursos obsoletos fueron eliminados sin intervención manual.
 
-    Monitorear el estado de las aplicaciones vía ArgoCD.
+---
 
-    Validar y aprobar cambios críticos (si se configura validación manual).
+## 📈 Comparativa: Antes vs Después
 
-    Gestionar incidentes o rollbacks si se presentan fallos.
+| Aspecto                  | Antes (Manual)                      | Después (Automatizado con ArgoCD)        |
+|--------------------------|-------------------------------------|------------------------------------------|
+| **Despliegue**           | `helm upgrade` manual               | Git push → ArgoCD → despliegue automático |
+| **Tiempo de intervención** | Alto                              | Bajo o nulo                               |
+| **Trazabilidad**         | Parcial                             | Completa en Git y visible en ArgoCD       |
+| **Errores humanos**      | Frecuentes                          | Minimizado                                |
+| **Rollbacks**            | Manual, propenso a errores          | Con un clic desde la UI de ArgoCD         |
+| **Visibilidad del estado** | Requiere inspección manual         | Panel visual desde la UI de ArgoCD        |
 
-    Administrar la configuración general del entorno GitOps.
+---
 
-    Documentar y extender el proceso a otros servicios y equipos.
+## 👤 Rol Actualizado del Operador
 
-    Este cambio te posiciona como operador de plataforma, más que como ejecutor manual de despliegues.
+**Antes**: Intervención operativa directa en cada despliegue.  
+**Ahora**: Rol orientado a plataforma, control de calidad y supervisión.
 
-🧪 Laboratorio local
+Nuevas responsabilidades:
 
-    Se implementó un entorno de pruebas usando Minikube, el cual replica en forma controlada el flujo de despliegue y permite:
+- 👀 Monitorear aplicaciones desde ArgoCD.
+- ✅ Validar cambios críticos si se requiere aprobación manual.
+- 🚑 Gestionar incidentes y ejecutar rollbacks.
+- 🧰 Administrar configuración GitOps y mantener el repositorio.
+- 📚 Documentar y escalar el modelo a nuevos servicios/equipos.
 
-    Validar comportamiento de ArgoCD.
+---
 
-    Testear cambios antes de aplicarlos en entornos productivos.
+## 🧪 Laboratorio Local
 
-    Capacitar equipos de desarrollo en el flujo GitOps.
+> Se armó un laboratorio de pruebas en Minikube que replica el flujo productivo en un entorno controlado.
+
+Beneficios del laboratorio:
+
+- Simular y validar despliegues sin afectar ambientes reales.
+- Capacitar a desarrolladores en GitOps.
+- Realizar pruebas de resiliencia y recuperación.
+
+---
+
+## 📌 Conclusión
+
+Este laboratorio demuestra cómo el uso de ArgoCD y Helm permite transformar un flujo de despliegue tradicional en una experiencia automatizada, reproducible y trazable, optimizando los tiempos y reduciendo riesgos.
+
+---
