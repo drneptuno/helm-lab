@@ -1,0 +1,5 @@
+apiVersion: v2
+name: mi-servicio
+description: Microservicio de prueba para ArgoCD y Helm
+version: 0.1.0
+appVersion: "1.0.0"
