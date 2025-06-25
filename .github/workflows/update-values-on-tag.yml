@@ -1,0 +1,32 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Update Helm Values on Tag
+
+on:
+  push:
+    tags:
+      - 'v*'  # cualquier tag como v1.0.0, v1.2.3, etc
+
+jobs:
+  update-helm-values:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Extract version from tag
+        id: get_tag
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Update values.yaml with new version
+        run: |
+          sed -i "s/tag: .*/tag: \"${VERSION}\"/" charts/servicio/values.yaml
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add charts/servicio/values.yaml
+          git commit -m "Update image tag to ${VERSION} from tag"
+          git push origin HEAD:main
